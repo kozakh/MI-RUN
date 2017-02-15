@@ -5,66 +5,84 @@
 #include "variable.h"
 #include "constantpool.h"
 #include "instruction.h"
+#include "heap.h"
+
 
 using namespace std;
 
+struct Operand
+{
+	static constexpr int 	 INT = 0;
+	static constexpr float FLOAT = 0.0;
+	static constexpr char   CHAR = '0';
+	
+};
 
 int main ()
 {	
+
 	const map<int,vector<Instruction>> codes = 
 	{
 		{
 			1, //FOR CYCLUS
 			{
-				{ Opcode :: ILOAD,     { 0 } }, //ILOAD 0
-				{ Opcode :: LDC,       { 0 } }, //ILOAD 2 
-				{ Opcode :: IADD,      {   } }, //IADD
-				{ Opcode :: ISTORE,    { 0 } }, //ISTORE 2
+				{ ILOAD,     { 0 } }, //ILOAD 0
+				{ LDC,       { 0 } }, //ILOAD 2 
+				{ IADD,      {   } }, //IADD
+				{ ISTORE,    { 0 } }, //ISTORE 2
 				
-				{ Opcode :: ILOAD,     { 0 } }, //ILOAD 0
-				{ Opcode :: ILOAD,     { 1 } }, //ILOAD 1 
-				{ Opcode :: IF_ICMPNE, { 0 } } //IF_CMPEG 0
+				{ ILOAD,     { 0 } }, //ILOAD 0
+				{ ILOAD,     { 1 } }, //ILOAD 1 
+				{ IF_ICMPNE, { 0 } } //IF_CMPEG 0
 			}
 		},
 		{
 			2, //CALCULATOR
 			{
-				{ Opcode :: ILOAD,  { 0 } }, //ILOAD 0
-				{ Opcode :: ILOAD,  { 1 } }, //ILOAD 0
-				{ Opcode :: IADD,   {   } }, //IADD
-				{ Opcode :: ISTORE, { 2 } }, //ISTORE 2
+				{ ILOAD,  { 0 } }, //ILOAD 0
+				{ ILOAD,  { 1 } }, //ILOAD 0
+				{ IADD,   {   } }, //IADD
+				{ ISTORE, { 2 } }, //ISTORE 2
 				
-				{ Opcode :: ILOAD,  { 0 } }, //ILOAD 0
-				{ Opcode :: ILOAD,  { 1 } }, //ILOAD 0
-				{ Opcode :: ISUB,   {   } }, //IADD
-				{ Opcode :: ISTORE, { 3 } }, //ISTORE 2
+				{ ILOAD,  { 0 } }, //ILOAD 0
+				{ ILOAD,  { 1 } }, //ILOAD 0
+				{ ISUB,   {   } }, //IADD
+				{ ISTORE, { 3 } }, //ISTORE 2
 				
-				{ Opcode :: ILOAD,  { 0 } }, //ILOAD 0
-				{ Opcode :: ILOAD,  { 1 } }, //ILOAD 0
-				{ Opcode :: IMUL,   {   } }, //IADD
-				{ Opcode :: ISTORE, { 4 } }, //ISTORE 4
+				{ ILOAD,  { 0 } }, //ILOAD 0
+				{ ILOAD,  { 1 } }, //ILOAD 0
+				{ IMUL,   {   } }, //IADD
+				{ ISTORE, { 4 } }, //ISTORE 4
 				
-				{ Opcode :: ILOAD,  { 0 } }, //ILOAD 0
-				{ Opcode :: ILOAD,  { 1 } }, //ILOAD 0
-				{ Opcode :: IDIV,   {   } }, //IADD
-				{ Opcode :: ISTORE, { 5 } }  //ISTORE 2
+				{ ILOAD,  { 0 } }, //ILOAD 0
+				{ ILOAD,  { 1 } }, //ILOAD 0
+				{ IDIV,   {   } }, //IADD
+				{ ISTORE, { 5 } }  //ISTORE 2
 			}
 		},
 		{
 			3, //FUCKTORIAL
 			{
-				{ Opcode :: ILOAD,        { 0 } }, // načti x   
-				{ Opcode :: LDC,       	  { 0 } }, // načti 1  
-				{ Opcode :: IF_ICMPNE, 	  { 5 } }, // srovnej 
-				{ Opcode :: LDC,          { 0 } }, // vrať 1
-				{ Opcode :: IRETURN,      {   } }, // rovnají se? vrať
-	/*5*/		{ Opcode :: ILOAD,        { 0 } }, // načti x
-				{ Opcode :: LDC,          { 0 } }, // načti 1
-				{ Opcode :: ILOAD,        { 0 } }, // načti x
-				{ Opcode :: ISUB,         {   } }, // odečti (ve stacku x-1 a x)
-				{ Opcode :: INVOKESTATIC, { 3 } }, // zavolej fact (x-1) 
-				{ Opcode :: IMUL,         {   } }, // vynásob fact (x-1) a x
-				{ Opcode :: IRETURN,      {   } }  // vrať x * fact (x-1)
+				{ ILOAD,        { 0 } }, // načti x   
+				{ LDC,       	{ 0 } }, // načti 1  
+				{ IF_ICMPNE, 	{ 5 } }, // srovnej 
+				{ LDC,          { 0 } }, // vrať 1
+				{ IRETURN,      {   } }, // rovnají se? vrať
+	/*5*/		{ ILOAD,        { 0 } }, // načti x
+				{ LDC,          { 0 } }, // načti 1
+				{ ILOAD,        { 0 } }, // načti x
+				{ ISUB,         {   } }, // odečti (ve stacku x-1 a x)
+				{ INVOKESTATIC, { 3 } }, // zavolej fact (x-1) 
+				{ IMUL,         {   } }, // vynásob fact (x-1) a x
+				{ IRETURN,      {   } }  // vrať x * fact (x-1)
+			}
+			
+		},
+		{
+			4,
+			{
+				{ ILOAD,    { 0 } }, //na stack velikost pole
+				{ NEWARRAY, { INT } }  //nové pole
 			}
 		}
 	};
@@ -100,7 +118,7 @@ int main ()
 	ConstantPool exampleClass ( codes, signatures, constants ); 
 
 	Var * y = new Var ( Type :: INT, { . m_Int = 0} );
-	Frame x ( 3, vars3, &exampleClass, &y ); 
+	Frame x ( 4, vars3, &exampleClass, &y ); 
 	
 	cout << x << endl;
 

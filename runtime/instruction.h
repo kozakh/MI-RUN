@@ -31,7 +31,11 @@ enum Opcode
 //  if_icmple = 0xA4
 //  if_icmplt = 0xA1
 
-	IRETURN = 0xAC 
+	IRETURN = 0xAC, 
+	
+	NEWARRAY = 0xBC,
+	ASTORE 	 = 0x3A,
+	ALOAD    = 0x19
 };
 
 struct Instruction

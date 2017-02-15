@@ -23,13 +23,15 @@ enum Type
 
 struct Ref
 {
-	ConstantPool * m_Class;
+	ConstantPool * m_Class; //
 	vector<Var>  * m_Members;
 };
 
 struct Arr
 {
-	vector<Var> * m_Array;
+	int           m_Type;
+	int 		  m_Len;
+	vector<Var> * m_Members;
 };
 
 union Val

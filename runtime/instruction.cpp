@@ -9,7 +9,11 @@ const map<int, int> Instruction :: OPERANDS_NR =
 	{ Opcode :: ILOAD,        1 },
 	{ Opcode :: INVOKESTATIC, 1 },  
 	{ Opcode ::	IF_ICMPNE,    1 }, 
-	{ Opcode :: LDC, 	      1 }
+	{ Opcode :: LDC, 	      1 },
+	{ Opcode :: NEWARRAY,     1 },
+	{ Opcode :: ASTORE,       1 },
+	{ Opcode :: ALOAD,        1 }
+	
 };
 
 /*

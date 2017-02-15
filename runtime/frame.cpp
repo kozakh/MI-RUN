@@ -3,14 +3,16 @@
 
 using namespace std;
 
+Heap Frame :: m_Heap;
+
 Frame :: Frame ( int i, const vector<Var> & vars, ConstantPool * constantPool, Frame * parent )
 : 	
 	m_Vars 			( vars ),
 	m_ConstantPool 	( constantPool ),
-	m_Parent 		( parent ),
-	m_ReturnAddress ( NULL ),
 	m_Code 			( m_ConstantPool -> getCode ( i )  ),
-	m_PC 			( m_Code -> begin () )
+	m_PC 			( m_Code -> begin () ),
+	m_ReturnAddress ( NULL ),
+	m_Parent 		( parent )
 { 
 	cout << * this << endl;
 	
@@ -30,10 +32,10 @@ Frame :: Frame ( int i, const vector<Var> & vars, ConstantPool * constantPool, V
 : 	
 	m_Vars 			( vars ),
 	m_ConstantPool 	( constantPool ),
-	m_Parent 		( NULL ),
-	m_ReturnAddress ( returnAddress ),
 	m_Code 			( m_ConstantPool -> getCode ( i )  ),
-	m_PC 			( m_Code -> begin () )
+	m_PC 			( m_Code -> begin () ),
+	m_ReturnAddress ( returnAddress ),
+	m_Parent 		( NULL )
 { 
 	cout << * this << endl;
 	
@@ -63,6 +65,55 @@ void Frame :: Process ( Instruction & instr )
 	Var op1, op2, rv;
 	switch ( instr . m_Opcode )
 	{	
+		//newarray
+		case Opcode :: NEWARRAY:
+		{
+			rv = Var ( Type :: ARRAY, { 0 } );
+			
+			
+			if ( m_Stack . back () . m_Type != Type :: INT )
+				throw runtime_error ( "Length of array must be int (newarray)." );
+			
+			rv . m_Val . m_Array . m_Len  = m_Stack . back () . m_Val . m_Int;
+			rv . m_Val . m_Array . m_Type = instr [0] . m_Type;
+			m_Stack . pop_back ();
+			m_Heap . Alloc ( rv );
+			m_Stack . push_back ( rv );   	
+			break;
+		}
+		
+		case Opcode :: ASTORE:
+		{
+			//cout << "Vars size:" << m_Vars . size () << endl;
+			if ( (unsigned) instr [0] . m_Val . m_Int >= m_Vars . size () )
+				throw runtime_error ( "Local variables index out of range (astore)." );
+			
+			if ( m_Vars [ instr [0] . m_Val . m_Int ] . m_Type != Type :: REFERENCE
+			  || m_Vars [ instr [0] . m_Val . m_Int ] . m_Type != Type :: ARRAY )
+				throw runtime_error ( "Local variable of invalid type (astore)." );
+
+			m_Vars [ instr [0] . m_Val . m_Int ] = m_Stack . back (); 
+			
+			m_Stack . pop_back ();
+			cout << "Stored " << m_Vars [ instr [0] . m_Val . m_Int ] << " into local variable " << instr [0] . m_Val . m_Int << " (istore)"<< endl;
+			break;
+		}
+		
+		
+		case Opcode :: ALOAD:
+		{
+			if ( (unsigned) instr [0] . m_Val . m_Int >= m_Vars . size () )
+				throw runtime_error ( "Local variables index out of range (aload)." );
+			
+			if ( m_Vars [ instr [0] . m_Val . m_Int ] . m_Type != Type :: REFERENCE 
+			  || m_Vars [ instr [0] . m_Val . m_Int ] . m_Type != Type :: ARRAY )
+				throw runtime_error ( "Local variable of invalid type (aload)." );
+
+			m_Stack . push_back ( m_Vars [ instr [0] . m_Val . m_Int ] );
+			cout << "Pushed " << m_Stack . back () << " into stack (aload)" << endl; 
+			break;
+		}
+		
 		//istore
 		case Opcode :: ISTORE:
 		{

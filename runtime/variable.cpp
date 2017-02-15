@@ -13,6 +13,16 @@ ostream & operator << ( ostream & os, const Var & x )
 			cout << "INT " << x . m_Val . m_Int;
 			break;
 		}
+		case Type :: ARRAY :
+		{
+			cout << "ARRAY : " << x . m_Val . m_Array . m_Len << endl;
+			for ( int i = 0; i < x . m_Val . m_Array . m_Len; i++ )
+			{
+				cout <<  "(" << (*(x . m_Val . m_Array . m_Members))[i] << ")";
+			}
+			break;
+		}
+		
 		default:
 		{
 			cout << "ERROR:" << x . m_Type << endl;
