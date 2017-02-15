@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Var :: Var ( int type, Value val ) : m_Type ( type ), m_Val ( val ) {}
+Var :: Var ( int type, Val val ) : m_Type ( type ), m_Val ( val ) {}
 
 ostream & operator << ( ostream & os, const Var & x )
 {
