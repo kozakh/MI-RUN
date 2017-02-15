@@ -1,5 +1,5 @@
 #ifndef _FRAME_H_
-#define _FRAME_H
+#define _FRAME_H_
 
 #include <deque>
 #include <vector>
