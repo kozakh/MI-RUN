@@ -1,20 +1,29 @@
 #ifndef _HEAP_H_
 #define _HEAP_H_
 
-#include "variable.h"
 #include <vector>
+#include <set>
+
+#include "variable.h"
+#include "class.h"
+#include "frame.h"
+
 
 using namespace std;
+
+class Frame;
 
 class Heap
 {
 	public:
-	void Alloc ( Var & x );
+//	Heap ( const ClassPool & classPool );
 	
-	void Gc ();
+	void Alloc ( Var & x, const ClassPool & classPool );
+	
+	void Gc ( const Frame & frame );
 	
 	private:
-	static vector<vector<Var>*> m_Heap;
+	static set<vector<Var>*> m_Heap; 
 };
 
 #endif

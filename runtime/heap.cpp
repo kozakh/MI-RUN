@@ -1,10 +1,11 @@
 #include "heap.h"
+#include <algorithm>
 
 using namespace std;
 
-vector<vector<Var>*> Heap :: m_Heap;
-
-void Heap :: Alloc ( Var & x )
+set<vector<Var>*> Heap :: m_Heap;
+ 
+void Heap :: Alloc ( Var & x, const ClassPool & classPool )
 {
 	if ( x . m_Type != Type :: REFERENCE && x . m_Type != Type :: ARRAY )
 		return;
@@ -13,41 +14,100 @@ void Heap :: Alloc ( Var & x )
 	{
 		x . m_Val . m_Array . m_Members = new vector<Var> ( x . m_Val . m_Array . m_Len ); 
 		
-		//cout << "Allocating field of len:  " << x . m_Val . m_Array . m_Len << endl;
-		//cout << "Allocating field of type: " << x . m_Val . m_Array . m_Type << endl;
-		
 		for ( auto i  = x . m_Val . m_Array . m_Members -> begin (); 
 				   i != x . m_Val . m_Array . m_Members -> end ();   ++ i )
 			(*i) . m_Type = x . m_Val . m_Array . m_Type; 
 		
-		m_Heap . push_back ( x . m_Val . m_Array . m_Members );
+		m_Heap . insert ( x . m_Val . m_Array . m_Members );
 	
-		cout << "Allocated new field" << endl;
+		cout << "HEAP: Allocated new field." << endl;
 		
-		cout << x << endl;
+		//cout << x << endl;
 	}
 	
 	else if ( x . m_Type == Type :: REFERENCE )
 	{
-		vector<Var> * prototype = NULL;
+		
+		const vector<Var> * prototype = NULL;
 		try
 		{
-		//	prototype = & ( x . m_Class -> m_ConstantPool -> getMembers () );
+			prototype = & (classPool . getClass ( x . m_Val . m_Reference . m_Class ) . getMembers ());
+			/*
+			cout << "!!!!!!!!!!!" << endl;
+			for ( int i  = 0; i < prototype -> size (); i ++ )
+				cout << (*prototype) [0] << " ";
+			cout << endl;	
+			*/
 		}
 		
 		catch ( out_of_range & )
 		{
-			throw runtime_error ( "Cant find prototype." );
+			throw runtime_error ( "Cant find class." );
 		}
+		
 		x . m_Val . m_Reference . m_Members = new vector<Var> ( * prototype ); 
-		
-		for ( auto i  = x . m_Val . m_Reference . m_Members -> begin (); 
-		           i != x . m_Val . m_Reference . m_Members -> end ();   ++ i )
-		{
-				Alloc ( *i );
-		}
-		
-		m_Heap . push_back ( x . m_Val . m_Reference . m_Members );
+		m_Heap . insert ( x . m_Val . m_Reference . m_Members );
 	}		
 } 
 
+void Heap :: Gc ( const Frame & frame )
+{
+	set<vector<Var>*> reachable;
+	
+	const Frame * current = & frame;
+	
+	while ( current )
+	{
+		for ( int i = 0; i < current -> m_Vars . size (); i ++ )
+		{
+			if 		( current -> m_Vars [i] . m_Type == Type :: ARRAY 
+				   && current -> m_Vars [i] . m_Val . m_Array . m_Members )
+			{
+				reachable . insert ( current -> m_Vars [i] . m_Val . m_Array . m_Members );
+			} 
+			 
+			else if ( current -> m_Vars [i] . m_Type == Type :: REFERENCE  
+				   && current -> m_Vars [i] . m_Val . m_Reference . m_Members )
+			{
+				reachable . insert ( current -> m_Vars [i] . m_Val . m_Reference . m_Members );
+			} 
+		}
+		for ( auto i : current -> m_Stack )
+		{
+			if 		( i . m_Type == Type :: ARRAY 
+				   && i . m_Val . m_Array . m_Members )
+			{
+				reachable . insert ( i . m_Val . m_Array . m_Members );
+			} 
+			 
+			else if ( i . m_Type == Type :: REFERENCE  
+				   && i . m_Val . m_Reference . m_Members )
+			{
+				reachable . insert ( i . m_Val . m_Reference . m_Members );
+			} 
+		}
+		current = current -> m_Parent;
+	}
+	
+	set<vector<Var> *> diff;
+	 
+	set_difference ( m_Heap . begin (), m_Heap . end (), reachable . begin (), reachable . end (), inserter ( diff, diff . end () ) );  
+	
+	cout << "GC:" << endl;
+	for ( auto i : diff )
+	{
+		cout << "(";
+		for ( auto j = i -> begin (); j != i -> end (); ++ j )
+		{
+			cout << *j; 
+			auto k = j; 
+			if ( ++ k != i -> end () ) 
+				cout << " "; 
+		}
+		cout << ") ";
+		m_Heap . erase ( i );
+		delete i;
+	}
+
+	cout << endl << "**********" << endl; 
+}

@@ -4,13 +4,9 @@
 #include <iostream>
 #include <vector>
 
-//#include "constantpool.h"
-
 using namespace std;
 
 struct Var;
-
-class ConstantPool;
 
 enum Type
 {
@@ -23,7 +19,7 @@ enum Type
 
 struct Ref
 {
-	ConstantPool * m_Class; //
+	int            m_Class;
 	vector<Var>  * m_Members;
 };
 
@@ -41,6 +37,7 @@ union Val
 	float	m_Float;
 	Ref     m_Reference;	
 	Arr     m_Array;
+
 };
 
 struct Var
