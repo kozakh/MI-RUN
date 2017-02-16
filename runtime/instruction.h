@@ -65,7 +65,8 @@ enum Opcode
 	GETFIELD = 0xB4,
 	PUTFIELD = 0xB5,
 
-	COUT    = 0xCB
+	COUT    = 0xCB,
+	GC 		= 0xCD
 };
 
 struct Instruction

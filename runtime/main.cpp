@@ -54,13 +54,12 @@ const ClassPool classPool
 					{
 						3,
 						{
-/*
 							{ LDC,        { 3 } },	// načtu 0
 							{ DUP				},	//	0 0
 							{ DUP				},	//	0 0 0
 							{ ALOAD, 	  { 0 } },	//	A 0 0 0
 							{ ARRAYLENGTH 		},	//	<L> 0 0 0
-							{ IF_ICMPEQ,  { 26 }},	// 0 0
+							{ IF_ICMPEQ,  { 25 }},	// 0 0
 							{ ALOAD, 	  { 0 } },	// A 0 0
 							{ IALOAD			},	// <I> 0
 							{ ISTORE,	  { 1 } },	//	0		----	break	--
@@ -71,7 +70,7 @@ const ClassPool classPool
 							{ DUP				},	//	1 1 1 1
 							{ ALOAD, 	  { 0 } },	//	R 1 1 1 1
 							{ ARRAYLENGTH 		},	//	<L> 1 1 1 1
-							{ IF_ICMPEQ,  { 26 }},	//  1 1 1
+							{ IF_ICMPEQ,  { 25 }},	//  1 1 1
 							{ ALOAD, 	  { 0 } },	// A 1 1 1
 							{ IALOAD			},	// <I> 1 1
 							{ ILOAD, 	  { 1 } },	// <I> <I> 1 1
@@ -79,9 +78,8 @@ const ClassPool classPool
 							{ SWAP				},	//	1 <I> 1
 							{ ALOAD,	  { 0 } },	//	A 1 <I> 1
 							{ IASTORE			},	//	1
-							{ GOTO,       { 2 } },
-							{ BREAKPOINT        }
-*/
+							{ GOTO,       { 1 } },
+							{ BREAKPOINT        },
 						}
 					}
 				},
@@ -89,8 +87,8 @@ const ClassPool classPool
 				{ 
 					{ 1, { { Op::INT } } },
 					{ 2, { { Op::INT } , Var ( Type :: REFERENCE, { 0 } ) } }, 
-					{ 3, { { Var ( Type :: ARRAY, { 0 } ) } } },
-					//{ 4, { { Var ( Type :: ARRAY, { 0 } ) }, { Op::INT } } }
+					//{ 3, { { Var ( Type :: ARRAY, { 0 } ) } } },
+					{ 3, { { Var ( Type :: ARRAY, { 0 } ) }, { Op::INT } } }
 				},
 				// CONSTANTS
 				{ 
@@ -176,13 +174,27 @@ int main ()
 
 	cout << "RV: " << rv -> m_Val . m_Int << endl;
 	*/
-	
+	/*
 	Var string1 ( Type :: ARRAY, { 1 } );
 	string1 . m_Val . m_Array . m_Members = new vector<Var> { 7, 3, 3, 7 };
 	string1 . m_Val . m_Array . m_Type = Type :: INT;
 	string1 . m_Val . m_Array . m_Len = 4;
-	
+
 	vector<Var> { string1, string1 };
+*/
+	Var array1 ( Type :: ARRAY, { 0 } );
+	array1 . m_Val . m_Array . m_Members = new vector<Var> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+	array1 . m_Val . m_Array . m_Type = Type :: INT;
+	array1 . m_Val . m_Array . m_Len = 20;
+
+	Var local ( Type :: INT, { 0 } );
+	vector<Var> psAttr { array1, local };
+
+	Var * rv =  new Var ( INT );
+	
+	Frame x ( 1, 3, psAttr, classPool, &rv );
+
+	cout << "RV: " << rv -> m_Val . m_Int << endl;
 	
 
 	return 0;	

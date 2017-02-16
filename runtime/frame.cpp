@@ -491,6 +491,13 @@ void Frame :: Process ( const Instruction & instr )
 			m_Stack . pop_back ();
 			break; 
 		}
+
+		case Opcode :: GC :
+		{
+			m_Heap . Gc ( *this );
+			break;
+		}
+
 		default:
 		{
 			cout << hex << instr . m_Opcode << endl;

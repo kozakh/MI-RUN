@@ -15,12 +15,12 @@ const map<int, int> Instruction :: OPERANDS_NR =
 	{ Opcode ::	IF_ICMPEQ,    1 }, 
 	{ Opcode :: LDC, 	      1 },
 	{ Opcode :: NEWARRAY,     1 },
-	{ Opcode :: ARRAYLENGTH,  1 },
 	{ Opcode :: NEW,          1 },
 	{ Opcode :: ASTORE,       1 },
 	{ Opcode :: ALOAD,        1 },
 	{ Opcode :: GETFIELD,     1 },
-	{ Opcode :: PUTFIELD,     1 }
+	{ Opcode :: PUTFIELD,     1 },
+	{ Opcode :: GOTO, 		  1 }
 };
 
 /*
@@ -44,7 +44,7 @@ Instruction :: Instruction ( int opcode, const vector<Var> & operands ) : m_Opco
 		m_OperandsNr = 0; 
 	}
 	if ( operands . size () != (unsigned) m_OperandsNr )
-		throw std::runtime_error ( "Error, bad number of operands for instruction." );	
+		throw std::runtime_error ( "Error, bad number of operands for instruction ( " + to_string ( opcode ) + ")" );	
 }
 
 Var Instruction :: operator [] ( int i ) const
